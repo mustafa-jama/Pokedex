@@ -5,7 +5,7 @@ export  function SideNav(props) {
   return (
     <nav>
       <div className={`header`}>
-        <h1 className='text-gradient'> Pokedex</h1>
+        <h1 className='text-gradient'> Pokédex</h1>
       </div>
 
       <input placeholder='enter pokemon' />

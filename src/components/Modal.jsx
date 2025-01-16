@@ -1,4 +1,5 @@
-export  function Modal(){
+export function Modal() {
 
-  return
+
+  return <></>;
 }

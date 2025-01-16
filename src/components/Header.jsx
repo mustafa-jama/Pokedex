@@ -1,7 +1,7 @@
 export  function Header (){
 
   return(
-    <header> Pokedex </header>
+    <header> Pokédex </header>
   )
 
 
