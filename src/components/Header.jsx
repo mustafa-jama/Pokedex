@@ -1,4 +1,4 @@
-export function Header (){
+export  function Header (){
 
   return(
     <header> Pokedex </header>
