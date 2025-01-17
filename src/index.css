@@ -238,6 +238,10 @@ h3 {
   gap: 1rem;
 
 }
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
 
 @media (min-width: 640px) {
   #root {

@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { getFullPokedexNumber, getPokedexNumber } from './utils';
-import { TypeCard } from './TypeCard';
+import TypeCard from './TypeCard';
+import Modal from 'module';
 const BASE_URL = 'https://pokeapi.co/api/v2/pokemon/';
 
 export function PokeCard(props) {
   const { selectedPokemon, isOpen, setIsOpen } = props;
   const [pokemonData, setPokemonData] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  //const [handleCloseModal,sethandleCloseModal]=(false)
 
   const abortControllerRef = useRef(null);
 
@@ -74,11 +75,11 @@ export function PokeCard(props) {
     return true;
   });
 
-
-
   return (
     <>
       <div className='poke-card'>
+
+
         <div>
           <h4>#{getFullPokedexNumber(selectedPokemon)}</h4>
           <h2>{name}</h2>
@@ -124,7 +125,13 @@ export function PokeCard(props) {
         <div className='pokemon-move-grid'>
           {moves.map((moveObj, moveIndex) => {
             return (
-              <button key={moveIndex} onClick={() =>{} }>
+              <button
+                className='button-card pokemon-move'
+                key={moveIndex}
+                onClick={() => {
+                  <Modal handleCloseModal={handleCloseModal} />;
+                }}
+              >
                 <p>{moveObj?.move?.name}</p>
               </button>
             );
