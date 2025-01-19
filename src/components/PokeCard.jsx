@@ -1,16 +1,66 @@
 import { useEffect, useRef, useState } from 'react';
 import { getFullPokedexNumber, getPokedexNumber } from './utils';
 import TypeCard from './TypeCard';
-import Modal from 'module';
+import Modal from './Modal';
 const BASE_URL = 'https://pokeapi.co/api/v2/pokemon/';
 
 export function PokeCard(props) {
   const { selectedPokemon, isOpen, setIsOpen } = props;
   const [pokemonData, setPokemonData] = useState(null);
   const [loading, setLoading] = useState(false);
-  //const [handleCloseModal,sethandleCloseModal]=(false)
+  const [skill, setSkill] = useState(null);
+  const [loadingSkill, setLoadingSkill] = useState(false);
 
   const abortControllerRef = useRef(null);
+
+  const fetchMoveData = async (move, moveUrl) => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    if (loadingSkill || !moveUrl) {
+      return;
+    }
+
+    let cache = {};
+    if (localStorage.getItem('pokemon-moves')) {
+      cache = JSON.parse(localStorage.getItem('pokemon-moves'));
+    }
+
+    if (move in cache) {
+      setSkill(cache[move]);
+      console.log('got it from cache')
+      return;
+    }
+
+    try {
+      setLoadingSkill(true)
+      const response = await fetch(moveUrl,signal)
+      const moveData = await response.json()
+      console.log('Fetched Data',  moveData)
+      const discription = moveData?.flavor_text_entries.filter((val) => {
+        return val.version_group.name = 'firered-leafgreen'
+      } )[0]?.flavor_text
+
+      const skillData = {
+
+        name: move,
+        discription
+      }
+      setSkill(skillData)
+
+      cache[move] = skillData
+
+      localStorage.setItem('pokemon-moves',JSON.stringify(cache))
+
+
+
+    } catch (e) {
+      console.error(e.message);
+    } finally {
+      setLoadingSkill(false);
+    }
+  };
 
   useEffect(() => {
     const cache = JSON.parse(localStorage.getItem('pokedex')) || {};
@@ -75,11 +125,31 @@ export function PokeCard(props) {
     return true;
   });
 
+  {console.log('Skill state:', skill);}
   return (
     <>
       <div className='poke-card'>
+        {skill && (
+          <Modal
+
+            handleCloseModal={() => {
+              console.log("Modal is closing...")
+              setSkill(null)
+              console.log("Updated skill state:", skill);
+            }}
 
 
+          >
+            <div>
+              <h6>Name</h6>
+              <h2>{skill.name}</h2>
+            </div>
+            <div>
+              <h6>Description</h6>
+              <p>{skill.discription}</p>
+            </div>
+          </Modal>
+        )}
         <div>
           <h4>#{getFullPokedexNumber(selectedPokemon)}</h4>
           <h2>{name}</h2>
@@ -129,7 +199,9 @@ export function PokeCard(props) {
                 className='button-card pokemon-move'
                 key={moveIndex}
                 onClick={() => {
-                  <Modal handleCloseModal={handleCloseModal} />;
+                  fetchMoveData(moveObj?.move?.name , moveObj?.move?.url)
+
+
                 }}
               >
                 <p>{moveObj?.move?.name}</p>
