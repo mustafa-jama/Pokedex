@@ -18,7 +18,7 @@ export function PokeCard(props) {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
-    if (loadingSkill || !moveUrl) {
+    if (loadingSkill || !moveUrl || !move) {
       return;
     }
 
@@ -95,6 +95,7 @@ export function PokeCard(props) {
       } finally {
         setLoading(false);
       }
+      {console.log('Skill state:', skill);}
     };
 
     fetchPokedex();
@@ -125,7 +126,7 @@ export function PokeCard(props) {
     return true;
   });
 
-  {console.log('Skill state:', skill);}
+
   return (
     <>
       <div className='poke-card'>

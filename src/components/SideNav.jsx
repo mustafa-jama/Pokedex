@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { first151Pokemon, getFullPokedexNumber } from './utils';
+import { first151Pokemon,  getFullPokedexNumber , getPokedexNumber} from './utils';
 export default function SideNav(props) {
   const { setSelectedPokemon } = props;
   const[currentPokemon, setCurrentPokemon] = useState('')
 
-  const filteredPokemon = first151Pokemon.filter((pokemon) => {
+  const filteredPokemon = first151Pokemon.filter((pokemon,pokeIndex) => {
 
     return(
 
-      pokemon.toLowerCase().includes(currentPokemon.toLowerCase())
+      pokemon.toLowerCase().includes(currentPokemon.toLowerCase()) ||
+      //pokeIndex.includes(getFullPokedexNumber(currentPokemon))
+
+
+      getFullPokedexNumber(pokeIndex).includes(currentPokemon)
+      
     )
   })
+
 
 
   return (
@@ -23,7 +29,8 @@ export default function SideNav(props) {
 
 
 
-      {filteredPokemon.map((pokemon, pokemonIndex) => {
+      {filteredPokemon.map((pokemon) => {
+        const pokemonIndex = first151Pokemon.indexOf(pokemon)
         return (
           <button
             key={pokemonIndex}
