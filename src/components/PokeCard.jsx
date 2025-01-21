@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, version } from 'react';
 import { getFullPokedexNumber, getPokedexNumber } from './utils';
 import TypeCard from './TypeCard';
 import Modal from './Modal';
@@ -12,6 +12,23 @@ export function PokeCard(props) {
   const [loadingSkill, setLoadingSkill] = useState(false);
 
   const abortControllerRef = useRef(null);
+
+  const { name, height, abilities, stats, types, moves, sprites } =
+    pokemonData || {};
+
+    const filterMoves = moves?.filter((move) => {
+
+        return(
+
+            move?.version_group_details?.some((detail) => detail.version_group.name === 'firered-leafgreen')
+        )
+    })
+
+  const imgList = Object.keys(sprites || {}).filter((val) => {
+    if (!sprites[val]) return false;
+    if (['versions', 'other'].includes(val)) return false;
+    return true;
+  });
 
   const fetchMoveData = async (move, moveUrl) => {
     abortControllerRef.current?.abort();
@@ -29,32 +46,28 @@ export function PokeCard(props) {
 
     if (move in cache) {
       setSkill(cache[move]);
-      console.log('got it from cache')
+      console.log('got it from cache');
       return;
     }
 
     try {
-      setLoadingSkill(true)
-      const response = await fetch(moveUrl,signal)
-      const moveData = await response.json()
-      console.log('Fetched Data',  moveData)
+      setLoadingSkill(true);
+      const response = await fetch(moveUrl, signal);
+      const moveData = await response.json();
+      console.log('Fetched Data', moveData);
       const discription = moveData?.flavor_text_entries.filter((val) => {
-        return val.version_group.name = 'firered-leafgreen'
-      } )[0]?.flavor_text
+        return (val.version_group.name = 'firered-leafgreen');
+      })[0]?.flavor_text;
 
       const skillData = {
-
         name: move,
-        discription
-      }
-      setSkill(skillData)
+        discription,
+      };
+      setSkill(skillData);
 
-      cache[move] = skillData
+      cache[move] = skillData;
 
-      localStorage.setItem('pokemon-moves',JSON.stringify(cache))
-
-
-
+      localStorage.setItem('pokemon-moves', JSON.stringify(cache));
     } catch (e) {
       console.error(e.message);
     } finally {
@@ -95,7 +108,9 @@ export function PokeCard(props) {
       } finally {
         setLoading(false);
       }
-      {console.log('Skill state:', skill);}
+      {
+        console.log('Skill state:', skill);
+      }
     };
 
     fetchPokedex();
@@ -117,29 +132,16 @@ export function PokeCard(props) {
     );
   }
 
-  const { name, height, abilities, stats, types, moves, sprites } =
-    pokemonData || {};
-
-  const imgList = Object.keys(sprites || {}).filter((val) => {
-    if (!sprites[val]) return false;
-    if (['versions', 'other'].includes(val)) return false;
-    return true;
-  });
-
-
   return (
     <>
       <div className='poke-card'>
         {skill && (
           <Modal
-
             handleCloseModal={() => {
-              console.log("Modal is closing...")
-              setSkill(null)
-              console.log("Updated skill state:", skill);
+              console.log('Modal is closing...');
+              setSkill(null);
+              console.log('Updated skill state:', skill);
             }}
-
-
           >
             <div>
               <h6>Name</h6>
@@ -153,7 +155,7 @@ export function PokeCard(props) {
         )}
         <div>
           <h4>#{getFullPokedexNumber(selectedPokemon)}</h4>
-          <h2>{name}</h2>
+          <h2>{name[0].toUpperCase() + name.slice(1)}</h2>
         </div>
 
         <div className='type-container'>
@@ -194,15 +196,13 @@ export function PokeCard(props) {
         </div>
         <h3>Moves</h3>
         <div className='pokemon-move-grid'>
-          {moves.map((moveObj, moveIndex) => {
+          {filterMoves.map((moveObj, moveIndex) => {
             return (
               <button
                 className='button-card pokemon-move'
                 key={moveIndex}
                 onClick={() => {
-                  fetchMoveData(moveObj?.move?.name , moveObj?.move?.url)
-
-
+                  fetchMoveData(moveObj?.move?.name, moveObj?.move?.url);
                 }}
               >
                 <p>{moveObj?.move?.name}</p>
